@@ -1,0 +1,26 @@
+[data-oversnap] {
+  --visible: 1;
+  --gap: 0rem;
+  --size: calc((100% / var(--visible)) - ((var(--gap) * (var(--visible) - 1)) / var(--visible)));
+  --align: center;
+}
+
+[data-oversnap-viewport] {
+  display: flex;
+  gap: var(--gap);
+  overflow: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: both mandatory;
+  scrollbar-width: none;
+}
+
+[data-oversnap-viewport]::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+[data-oversnap-item] {
+  flex-shrink: 0;
+  width: var(--size);
+  scroll-snap-align: var(--align);
+}
