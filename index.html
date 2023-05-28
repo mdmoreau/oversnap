@@ -5,6 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>oversnap</title>
     <link rel="stylesheet" href="index.css">
+    <style>
+      body {
+        margin: 1rem;
+      }
+
+      [data-oversnap] {
+        --gap: 1rem;
+
+        text-align: center;
+      }
+
+      [data-oversnap-viewport] {
+        margin-bottom: 1rem;
+      }
+
+      [data-oversnap-item] {
+        display: grid;
+        place-items: center;
+        height: 20rem;
+        background: gray;
+      }
+    </style>
   </head>
   <body>
     <div data-oversnap>
