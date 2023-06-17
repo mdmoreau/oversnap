@@ -25,15 +25,21 @@ export default (root) => {
     entries.forEach((entry) => {
       const { target, isIntersecting } = entry;
       const index = [...items].indexOf(target);
+      const start = index === 0;
+      const end = index === items.length - 1;
 
       if (isIntersecting) {
         visible.push(index);
         target.removeAttribute('inert');
         pages[index]?.setAttribute('data-oversnap-page', 'visible');
+        start && prev?.setAttribute('disabled', 'disabled');
+        end && next?.setAttribute('disabled', 'disabled');
       } else {
         visible = visible.filter((i) => i !== index);
         target.setAttribute('inert', '');
         pages[index]?.setAttribute('data-oversnap-page', '');
+        start && prev?.removeAttribute('disabled');
+        end && next?.removeAttribute('disabled');
       }
 
       visible = [...new Set(visible)].sort((a, b) => a - b);
