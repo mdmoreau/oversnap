@@ -29,11 +29,11 @@ export default (root) => {
       if (isIntersecting) {
         visible.push(index);
         target.removeAttribute('inert');
-        pages[index].setAttribute('data-oversnap-page', 'visible');
+        pages[index]?.setAttribute('data-oversnap-page', 'visible');
       } else {
         visible = visible.filter((i) => i !== index);
         target.setAttribute('inert', '');
-        pages[index].setAttribute('data-oversnap-page', '');
+        pages[index]?.setAttribute('data-oversnap-page', '');
       }
 
       visible = [...new Set(visible)].sort((a, b) => a - b);
