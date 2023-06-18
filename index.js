@@ -11,10 +11,11 @@ export default (root) => {
     const item = items[index];
 
     if (item) {
+      const dir = getComputedStyle(viewport).getPropertyValue('--dir').trim();
       const align = getComputedStyle(item).getPropertyValue('--align').trim();
       const options = {
-        block: align,
-        inline: align,
+        block: dir === 'block' ? align : 'nearest',
+        inline: dir === 'inline' ? align : 'nearest',
       };
 
       item.scrollIntoView(options);

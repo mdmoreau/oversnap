@@ -1,8 +1,9 @@
 [data-oversnap] {
+  --dir: inline;
+  --align: center;
   --visible: 1;
   --gap: 0rem;
   --size: calc((100% / var(--visible)) - ((var(--gap) * (var(--visible) - 1)) / var(--visible)));
-  --align: center;
 }
 
 [data-oversnap-viewport] {
