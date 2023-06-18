@@ -6,13 +6,19 @@
     <title>oversnap</title>
     <link rel="stylesheet" href="index.css">
     <style>
+      :root {
+        scroll-behavior: smooth;
+      }
+
       body {
         margin: 1rem;
       }
 
       [data-oversnap] {
+        --visible: 2.5;
         --gap: 1rem;
 
+        margin-block: 48rem;
         text-align: center;
       }
 
