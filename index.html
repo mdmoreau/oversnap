@@ -6,36 +6,75 @@
     <title>oversnap</title>
     <link rel="stylesheet" href="index.css">
     <style>
-      :root {
-        scroll-behavior: smooth;
-      }
-
       body {
-        margin: 1rem;
+        margin: 0;
       }
 
       [data-oversnap] {
         --visible: 2.5;
         --gap: 1rem;
+        --size: calc((100% / var(--visible)) - ((var(--gap) * (var(--visible) - 1)) / var(--visible)));
 
-        margin-block: 48rem;
+        margin: 3rem;
         text-align: center;
       }
 
       [data-oversnap-viewport] {
+        gap: var(--gap);
         margin-bottom: 1rem;
+
+        [data-oversnap="column"] &  {
+          flex-direction: column;
+          height: 20rem;
+        }
       }
 
       [data-oversnap-item] {
         display: grid;
         place-items: center;
+        width: var(--size);
         height: 20rem;
         background: gray;
+
+        [data-oversnap="column"] &  {
+          width: 100%;
+          height: var(--size);
+        }
+
+        &[inert] {
+          opacity: 0.5;
+        }
+      }
+
+      [data-oversnap-page="visible"] {
+        background: yellow;
       }
     </style>
   </head>
   <body>
     <div data-oversnap>
+      <div data-oversnap-viewport>
+        <div data-oversnap-item><button>0</button></div>
+        <div data-oversnap-item><button>1</button></div>
+        <div data-oversnap-item><button>2</button></div>
+        <div data-oversnap-item><button>3</button></div>
+        <div data-oversnap-item><button>4</button></div>
+        <div data-oversnap-item><button>5</button></div>
+        <div data-oversnap-item><button>6</button></div>
+        <div data-oversnap-item><button>7</button></div>
+      </div>
+      <button data-oversnap-prev>-</button>
+      <button data-oversnap-page>0</button>
+      <button data-oversnap-page>1</button>
+      <button data-oversnap-page>2</button>
+      <button data-oversnap-page>3</button>
+      <button data-oversnap-page>4</button>
+      <button data-oversnap-page>5</button>
+      <button data-oversnap-page>6</button>
+      <button data-oversnap-page>7</button>
+      <button data-oversnap-next>+</button>
+    </div>
+    <div data-oversnap="column">
       <div data-oversnap-viewport>
         <div data-oversnap-item><button>0</button></div>
         <div data-oversnap-item><button>1</button></div>

@@ -11,14 +11,41 @@ export default (root) => {
     const item = items[index];
 
     if (item) {
-      const dir = getComputedStyle(viewport).getPropertyValue('--dir').trim();
-      const align = getComputedStyle(item).getPropertyValue('--align').trim();
-      const options = {
-        block: dir === 'block' ? align : 'nearest',
-        inline: dir === 'inline' ? align : 'nearest',
-      };
+      const dir = getComputedStyle(viewport).getPropertyValue('flex-direction');
+      const align = getComputedStyle(item).getPropertyValue('scroll-snap-align');
 
-      item.scrollIntoView(options);
+      let x = 0;
+      let y = 0;
+
+      if (dir === 'row') {
+        switch (align) {
+          case 'start':
+            x = item.offsetLeft;
+            break;
+          case 'end':
+            x = item.offsetLeft - (viewport.offsetWidth - item.offsetWidth);
+            break;
+          case 'center':
+            x = item.offsetLeft - (viewport.offsetWidth - item.offsetWidth) / 2;
+            break;
+        }
+      }
+
+      if (dir === 'column') {
+        switch (align) {
+          case 'start':
+            y = item.offsetTop;
+            break;
+          case 'end':
+            y = item.offsetTop - (viewport.offsetHeight - item.offsetHeight);
+            break;
+          case 'center':
+            y = item.offsetTop - (viewport.offsetHeight - item.offsetHeight) / 2;
+            break;
+        }
+      }
+
+      viewport.scroll(x, y);
     }
   };
 

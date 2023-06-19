@@ -1,14 +1,6 @@
-[data-oversnap] {
-  --dir: inline;
-  --align: center;
-  --visible: 1;
-  --gap: 0rem;
-  --size: calc((100% / var(--visible)) - ((var(--gap) * (var(--visible) - 1)) / var(--visible)));
-}
-
 [data-oversnap-viewport] {
   display: flex;
-  gap: var(--gap);
+  position: relative;
   overflow: auto;
   scroll-behavior: smooth;
   scroll-snap-type: both mandatory;
@@ -22,6 +14,5 @@
 
 [data-oversnap-item] {
   flex-shrink: 0;
-  width: var(--size);
-  scroll-snap-align: var(--align);
+  scroll-snap-align: center;
 }
