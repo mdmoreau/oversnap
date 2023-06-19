@@ -60,8 +60,8 @@ export default (root) => {
         visible.push(index);
         target.removeAttribute('inert');
         pages[index]?.setAttribute('data-oversnap-page', 'visible');
-        start && prev?.setAttribute('disabled', 'disabled');
-        end && next?.setAttribute('disabled', 'disabled');
+        start && prev?.setAttribute('disabled', '');
+        end && next?.setAttribute('disabled', '');
       } else {
         visible = visible.filter((i) => i !== index);
         target.setAttribute('inert', '');
@@ -71,6 +71,7 @@ export default (root) => {
       }
 
       visible = [...new Set(visible)].sort((a, b) => a - b);
+      root.dispatchEvent(new Event('visible'));
     });
   }, {
     root: viewport,
