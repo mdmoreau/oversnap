@@ -71,7 +71,7 @@ export default (root) => {
       }
 
       visible = [...new Set(visible)].sort((a, b) => a - b);
-      root.dispatchEvent(new Event('visible'));
+      root.dispatchEvent(new Event('change'));
     });
   }, {
     root: viewport,
