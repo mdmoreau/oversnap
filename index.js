@@ -1,7 +1,9 @@
 export default (root) => {
-  let visible = [];
+  let active = [];
 
+  const frame = root.querySelector('[data-oversnap-frame]');
   const viewport = root.querySelector('[data-oversnap-viewport]');
+  const scroll = root.querySelector('[data-oversnap-scroll]');
   const items = root.querySelectorAll('[data-oversnap-item]');
   const prev = root.querySelector('[data-oversnap-prev]');
   const next = root.querySelector('[data-oversnap-next]');
@@ -11,7 +13,7 @@ export default (root) => {
     const item = items[index];
 
     if (item) {
-      const dir = getComputedStyle(viewport).getPropertyValue('flex-direction');
+      const dir = getComputedStyle(scroll).getPropertyValue('flex-direction');
       const align = getComputedStyle(item).getPropertyValue('scroll-snap-align');
 
       let x = 0;
@@ -23,10 +25,10 @@ export default (root) => {
             x = item.offsetLeft;
             break;
           case 'end':
-            x = item.offsetLeft - (viewport.offsetWidth - item.offsetWidth);
+            x = item.offsetLeft - (scroll.offsetWidth - item.offsetWidth);
             break;
           case 'center':
-            x = item.offsetLeft - (viewport.offsetWidth - item.offsetWidth) / 2;
+            x = item.offsetLeft - (scroll.offsetWidth - item.offsetWidth) / 2;
             break;
         }
       }
@@ -37,19 +39,35 @@ export default (root) => {
             y = item.offsetTop;
             break;
           case 'end':
-            y = item.offsetTop - (viewport.offsetHeight - item.offsetHeight);
+            y = item.offsetTop - (scroll.offsetHeight - item.offsetHeight);
             break;
           case 'center':
-            y = item.offsetTop - (viewport.offsetHeight - item.offsetHeight) / 2;
+            y = item.offsetTop - (scroll.offsetHeight - item.offsetHeight) / 2;
             break;
         }
       }
 
-      viewport.scroll(x, y);
+      scroll.scroll(x, y);
     }
   };
 
-  const observer = new IntersectionObserver((entries) => {
+  const inertObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const { target, isIntersecting } = entry;
+
+      if (isIntersecting) {
+        target.removeAttribute('inert');
+      } else {
+        target.setAttribute('inert', '');
+      }
+    });
+  }, {
+    root: frame ?? scroll,
+    rootMargin: '1px',
+    threshold: 1,
+  });
+
+  const activeObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       const { target, isIntersecting } = entry;
       const index = [...items].indexOf(target);
@@ -57,44 +75,48 @@ export default (root) => {
       const end = index === items.length - 1;
 
       if (isIntersecting) {
-        visible.push(index);
-        target.removeAttribute('inert');
-        pages[index]?.setAttribute('data-oversnap-page', 'visible');
+        active.push(index);
+        target.setAttribute('data-oversnap-item', 'active');
+        pages[index]?.setAttribute('data-oversnap-page', 'active');
         start && prev?.setAttribute('disabled', '');
         end && next?.setAttribute('disabled', '');
       } else {
-        visible = visible.filter((i) => i !== index);
-        target.setAttribute('inert', '');
+        active = active.filter((i) => i !== index);
+        target.setAttribute('data-oversnap-item', '');
         pages[index]?.setAttribute('data-oversnap-page', '');
         start && prev?.removeAttribute('disabled');
         end && next?.removeAttribute('disabled');
       }
 
-      visible = [...new Set(visible)].sort((a, b) => a - b);
-      root.dispatchEvent(new Event('change'));
+      active = [...new Set(active)].sort((a, b) => a - b);
+      root.dispatchEvent(new CustomEvent('change', {
+        detail: {
+          items,
+          active,
+        },
+      }));
     });
   }, {
-    root: viewport,
+    root: viewport ?? scroll,
     rootMargin: '1px',
     threshold: 1,
   });
 
   items.forEach((item) => {
-    observer.observe(item);
+    inertObserver.observe(item);
+    activeObserver.observe(item);
   });
 
   if (prev) {
     prev.addEventListener('click', () => {
-      const index = visible[0] - 1;
-
+      const index = active[0] - 1;
       nav(index);
     });
   }
 
   if (next) {
     next.addEventListener('click', () => {
-      const index = visible[visible.length - 1] + 1;
-
+      const index = active[active.length - 1] + 1;
       nav(index);
     });
   }

@@ -2,6 +2,8 @@
   "name": "oversnap",
   "version": "0.5.0",
   "type": "module",
+  "main": "index.js",
+  "style": "index.css",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

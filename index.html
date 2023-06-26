@@ -11,22 +11,31 @@
       }
 
       [data-oversnap] {
-        --visible: 2.5;
+        --active: 3;
         --gap: 1rem;
-        --size: calc((100% / var(--visible)) - ((var(--gap) * (var(--visible) - 1)) / var(--visible)));
+        --size: calc((100% / var(--active)) - ((var(--gap) * (var(--active) - 1)) / var(--active)));
 
         margin: 3rem;
         text-align: center;
       }
 
       [data-oversnap-viewport] {
+        margin-inline: 20rem;
+      }
+
+      [data-oversnap-viewport] [data-oversnap-scroll] {
+        margin-inline: -20rem;
+        padding-inline: 20rem;
+      }
+
+      [data-oversnap-scroll] {
         gap: var(--gap);
         margin-bottom: 1rem;
+      }
 
-        [data-oversnap="column"] &  {
-          flex-direction: column;
-          height: 20rem;
-        }
+      [data-oversnap="column"] [data-oversnap-scroll] {
+        flex-direction: column;
+        height: 20rem;
       }
 
       [data-oversnap-item] {
@@ -35,33 +44,38 @@
         width: var(--size);
         height: 20rem;
         background: gray;
-
-        [data-oversnap="column"] &  {
-          width: 100%;
-          height: var(--size);
-        }
-
-        &[inert] {
-          opacity: 0.5;
-        }
+        opacity: 0.5;
       }
 
-      [data-oversnap-page="visible"] {
+      [data-oversnap="column"] [data-oversnap-item]  {
+        width: 100%;
+        height: var(--size);
+      }
+
+      [data-oversnap-item="active"] {
+        opacity: 1;
+      }
+
+      [data-oversnap-page="active"] {
         background: yellow;
       }
     </style>
   </head>
   <body>
     <div data-oversnap>
-      <div data-oversnap-viewport>
-        <div data-oversnap-item><button>0</button></div>
-        <div data-oversnap-item><button>1</button></div>
-        <div data-oversnap-item><button>2</button></div>
-        <div data-oversnap-item><button>3</button></div>
-        <div data-oversnap-item><button>4</button></div>
-        <div data-oversnap-item><button>5</button></div>
-        <div data-oversnap-item><button>6</button></div>
-        <div data-oversnap-item><button>7</button></div>
+      <div data-oversnap-frame>
+        <div data-oversnap-viewport>
+          <div data-oversnap-scroll>
+            <div data-oversnap-item><button>0</button></div>
+            <div data-oversnap-item><button>1</button></div>
+            <div data-oversnap-item><button>2</button></div>
+            <div data-oversnap-item><button>3</button></div>
+            <div data-oversnap-item><button>4</button></div>
+            <div data-oversnap-item><button>5</button></div>
+            <div data-oversnap-item><button>6</button></div>
+            <div data-oversnap-item><button>7</button></div>
+          </div>
+        </div>
       </div>
       <button data-oversnap-prev>-</button>
       <button data-oversnap-page>0</button>
@@ -75,7 +89,7 @@
       <button data-oversnap-next>+</button>
     </div>
     <div data-oversnap="column">
-      <div data-oversnap-viewport>
+      <div data-oversnap-scroll>
         <div data-oversnap-item><button>0</button></div>
         <div data-oversnap-item><button>1</button></div>
         <div data-oversnap-item><button>2</button></div>
@@ -103,6 +117,9 @@
 
       for (const target of targets) {
         oversnap(target);
+        target.addEventListener('change', (e) => {
+          console.log(e.detail);
+        });
       }
     </script>
   </body>
