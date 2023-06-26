@@ -49,81 +49,44 @@ export default (root) => {
     }
   };
 
-  const margin = () => {
-    const dir = getComputedStyle(viewport).getPropertyValue('flex-direction');
-    const before = getComputedStyle(viewport, '::before');
-    const after = getComputedStyle(viewport, '::after');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const { target, isIntersecting } = entry;
+      const index = [...items].indexOf(target);
+      const start = index === 0;
+      const end = index === items.length - 1;
 
-    let top = 1;
-    let right = 1;
-    let bottom = 1;
-    let left = 1;
+      if (isIntersecting) {
+        visible.push(index);
+        target.removeAttribute('inert');
+        pages[index]?.setAttribute('data-oversnap-page', 'visible');
+        start && prev?.setAttribute('disabled', '');
+        end && next?.setAttribute('disabled', '');
+      } else {
+        visible = visible.filter((i) => i !== index);
+        target.setAttribute('inert', '');
+        pages[index]?.setAttribute('data-oversnap-page', '');
+        start && prev?.removeAttribute('disabled');
+        end && next?.removeAttribute('disabled');
+      }
 
-    if (dir === 'row') {
-      right = parseInt(after.width) * -1 + 1 || 1;
-      left = parseInt(before.width) * -1 + 1 || 1;
-    }
-
-    if (dir === 'column') {
-      top = parseInt(before.height) * -1 + 1 || 1;
-      bottom = parseInt(after.height) * -1 + 1 || 1;
-    }
-
-    return `${top}px ${right}px ${bottom}px ${left}px`;
-  };
-
-  const setup = () => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const { target, isIntersecting } = entry;
-        const index = [...items].indexOf(target);
-        const start = index === 0;
-        const end = index === items.length - 1;
-
-        if (isIntersecting) {
-          visible.push(index);
-          target.removeAttribute('inert');
-          pages[index]?.setAttribute('data-oversnap-page', 'visible');
-          start && prev?.setAttribute('disabled', '');
-          end && next?.setAttribute('disabled', '');
-        } else {
-          visible = visible.filter((i) => i !== index);
-          target.setAttribute('inert', '');
-          pages[index]?.setAttribute('data-oversnap-page', '');
-          start && prev?.removeAttribute('disabled');
-          end && next?.removeAttribute('disabled');
-        }
-
-        visible = [...new Set(visible)].sort((a, b) => a - b);
-        root.dispatchEvent(new Event('change'));
-      });
-    }, {
-      root: viewport,
-      rootMargin: margin(),
-      threshold: 1,
+      visible = [...new Set(visible)].sort((a, b) => a - b);
+      root.dispatchEvent(new Event('change'));
     });
-
-    return observer;
-  };
+  }, {
+    root: viewport,
+    rootMargin: '1px',
+    threshold: 1,
+  });
 
   items.forEach((item) => {
-    let observer = setup();
     observer.observe(item);
-
-    const recalc = () => {
-      if (observer.rootMargin !== margin()) {
-        observer.disconnect();
-        observer = setup();
-        observer.observe(item);
-      }
-    };
-
-    window.addEventListener('resize', recalc);
   });
 
   if (prev) {
     prev.addEventListener('click', () => {
       const index = visible[0] - 1;
+
       nav(index);
     });
   }
@@ -131,6 +94,7 @@ export default (root) => {
   if (next) {
     next.addEventListener('click', () => {
       const index = visible[visible.length - 1] + 1;
+
       nav(index);
     });
   }
