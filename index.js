@@ -1,7 +1,4 @@
 export default (root) => {
-  let active = [];
-
-  const frame = root.querySelector('[data-oversnap-frame]');
   const viewport = root.querySelector('[data-oversnap-viewport]');
   const scroll = root.querySelector('[data-oversnap-scroll]');
   const items = root.querySelectorAll('[data-oversnap-item]');
@@ -9,23 +6,31 @@ export default (root) => {
   const next = root.querySelector('[data-oversnap-next]');
   const pages = root.querySelectorAll('[data-oversnap-page]');
 
+  let active = [];
+
+  const align = () => {
+    return getComputedStyle(items[0]).getPropertyValue('scroll-snap-align');
+  };
+
   const nav = (index) => {
     const item = items[index];
 
     if (item) {
       const dir = getComputedStyle(scroll).getPropertyValue('flex-direction');
-      const align = getComputedStyle(item).getPropertyValue('scroll-snap-align');
+      const alignment = align();
 
-      let x = 0;
-      let y = 0;
+      let x, y;
 
       if (dir === 'row') {
-        switch (align) {
+        const start = parseInt(getComputedStyle(scroll).getPropertyValue('scroll-padding-left'), 10);
+        const end = parseInt(getComputedStyle(scroll).getPropertyValue('scroll-padding-right'), 10);
+
+        switch (alignment) {
           case 'start':
-            x = item.offsetLeft;
+            x = item.offsetLeft - start;
             break;
           case 'end':
-            x = item.offsetLeft - (scroll.offsetWidth - item.offsetWidth);
+            x = item.offsetLeft + end - (scroll.offsetWidth - item.offsetWidth);
             break;
           case 'center':
             x = item.offsetLeft - (scroll.offsetWidth - item.offsetWidth) / 2;
@@ -34,12 +39,15 @@ export default (root) => {
       }
 
       if (dir === 'column') {
-        switch (align) {
+        const start = parseInt(getComputedStyle(scroll).getPropertyValue('scroll-padding-top'), 10);
+        const end = parseInt(getComputedStyle(scroll).getPropertyValue('scroll-padding-bottom'), 10);
+
+        switch (alignment) {
           case 'start':
-            y = item.offsetTop;
+            y = item.offsetTop - start;
             break;
           case 'end':
-            y = item.offsetTop - (scroll.offsetHeight - item.offsetHeight);
+            y = item.offsetTop + end - (scroll.offsetHeight - item.offsetHeight);
             break;
           case 'center':
             y = item.offsetTop - (scroll.offsetHeight - item.offsetHeight) / 2;
@@ -51,23 +59,7 @@ export default (root) => {
     }
   };
 
-  const inertObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      const { target, isIntersecting } = entry;
-
-      if (isIntersecting) {
-        target.removeAttribute('inert');
-      } else {
-        target.setAttribute('inert', '');
-      }
-    });
-  }, {
-    root: frame ?? scroll,
-    rootMargin: '1px',
-    threshold: 1,
-  });
-
-  const activeObserver = new IntersectionObserver((entries) => {
+  const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       const { target, isIntersecting } = entry;
       const index = [...items].indexOf(target);
@@ -76,12 +68,14 @@ export default (root) => {
 
       if (isIntersecting) {
         active.push(index);
+        target.removeAttribute('inert');
         target.setAttribute('data-oversnap-item', 'active');
         pages[index]?.setAttribute('data-oversnap-page', 'active');
         start && prev?.setAttribute('disabled', '');
         end && next?.setAttribute('disabled', '');
       } else {
         active = active.filter((i) => i !== index);
+        target.setAttribute('inert', '');
         target.setAttribute('data-oversnap-item', '');
         pages[index]?.setAttribute('data-oversnap-page', '');
         start && prev?.removeAttribute('disabled');
@@ -103,20 +97,49 @@ export default (root) => {
   });
 
   items.forEach((item) => {
-    inertObserver.observe(item);
-    activeObserver.observe(item);
+    observer.observe(item);
   });
 
   if (prev) {
     prev.addEventListener('click', () => {
-      const index = active[0] - 1;
+      const alignment = align();
+
+      let index;
+
+      switch (alignment) {
+        case 'start':
+          index = active[0] - 1;
+          break;
+        case 'end':
+          index = active[active.length - 1] - 1;
+          break;
+        case 'center':
+          index = active[Math.floor(active.length / 2)] - 1;
+          break;
+      }
+
       nav(index);
     });
   }
 
   if (next) {
     next.addEventListener('click', () => {
-      const index = active[active.length - 1] + 1;
+      const alignment = align();
+
+      let index;
+
+      switch (alignment) {
+        case 'start':
+          index = active[0] + 1;
+          break;
+        case 'end':
+          index = active[active.length - 1] + 1;
+          break;
+        case 'center':
+          index = active[Math.floor(active.length / 2)] + 1;
+          break;
+      }
+
       nav(index);
     });
   }
