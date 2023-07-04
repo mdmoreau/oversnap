@@ -46,6 +46,20 @@
         height: 20rem;
         background: gray;
         opacity: 0.5;
+        scroll-snap-align: center;
+      }
+
+      [data-oversnap-scroll]::before,
+      [data-oversnap-scroll]::after {
+        content: "";
+        flex-shrink: 0;
+        width: var(--size);
+      }
+
+      [data-oversnap="column"] [data-oversnap-scroll]::before,
+      [data-oversnap="column"] [data-oversnap-scroll]::after {
+        width: auto;
+        height: var(--size);
       }
 
       [data-oversnap="column"] [data-oversnap-item]  {
@@ -117,7 +131,7 @@
       for (const target of targets) {
         oversnap(target);
         target.addEventListener('change', (e) => {
-          console.log(e.detail);
+          // console.log(e.detail);
         });
       }
     </script>
