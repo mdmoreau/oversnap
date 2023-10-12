@@ -59,7 +59,7 @@ export default (root) => {
       return { index, proximity };
     });
 
-    return proximities.sort((a, b) => a.proximity - b.proximity)[0].index;
+    return proximities.sort((a, b) => a.proximity - b.proximity)[0]?.index;
   };
 
   const getDirection = () => {
@@ -123,17 +123,8 @@ export default (root) => {
   const setDisabled = () => {
     const progress = getProgress();
 
-    if (progress === 0) {
-      prev?.setAttribute('disabled', '');
-    } else {
-      prev?.removeAttribute('disabled');
-    }
-
-    if (progress === 1) {
-      next?.setAttribute('disabled', '');
-    } else {
-      next?.removeAttribute('disabled');
-    }
+    prev?.toggleAttribute('disabled', progress === 0);
+    next?.toggleAttribute('disabled', progress === 1);
   };
 
   const setScroll = (index) => {
