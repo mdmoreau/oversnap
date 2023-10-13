@@ -192,7 +192,7 @@ export default (root) => {
 
   if (prev || next) {
     setDisabled();
-    scroll.addEventListener('scrollend', setDisabled);
+    scroll.addEventListener('scroll', setDisabled);
   }
 
   pages.forEach((page, index) => {
